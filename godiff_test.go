@@ -1,8 +1,6 @@
 package godiff
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestReverse(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
