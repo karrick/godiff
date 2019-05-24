@@ -14,7 +14,7 @@ slices of strings.
 ```Go
 	left := []string{"hydrogen", "helium", "hydrogen", "lithium", "carbon"}
 	right := []string{"hydrogen", "boron", "helium", "hydrogen", "carbon", "nitrogen"}
-	
+
 	//  hydrogen
 	// +boron
 	//  helium
@@ -23,10 +23,9 @@ slices of strings.
 	//  carbon
 	// +nitrogen
 	want := []string{" hydrogen", "+boron", " helium", " hydrogen", "-lithium", " carbon", "+nitrogen"}
-	
-	
+
 	for _, s := range godiff.Strings(left, right) {
-        fmt.Println(s)
+		fmt.Println(s)
 	}
 ```
 
