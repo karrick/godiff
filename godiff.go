@@ -12,16 +12,14 @@ func reverse(list []string) {
 	var i int
 
 	for i < l {
-		t := list[i]
-		list[i] = list[l]
-		list[l] = t
+		list[i], list[l] = list[l], list[i] // swap elements
 		i++
 		l--
 	}
 }
 
 // partition splits the two lists into logical chunks of a shared prefix, a
-// shared suffix, and any first over middle bits for the first and second side.
+// shared suffix, and any middle bits for the first and second side.
 func partition(alpha, bravo []string) (prefix []string, suffix []string, uniqueAlpha []string, uniqueBravo []string) {
 	al := len(alpha)
 	if al == 0 {
@@ -39,56 +37,53 @@ func partition(alpha, bravo []string) (prefix []string, suffix []string, uniqueA
 	ae, be := al, bl // end   = length
 
 	// build common prefix
-	for {
-		if alpha[ai] != bravo[bi] {
-			break
-		}
+	for alpha[ai] == bravo[bi] {
 		prefix = append(prefix, alpha[ai])
 		ai++
 		bi++
-		if ai == ae || bi == be {
-			// either one or both of these loops will be no-ops
+		// When either slice is at its end, there is no common suffix.
+		if ai == ae {
 			for i := bi; i < be; i++ {
 				uniqueBravo = append(uniqueBravo, bravo[i])
 			}
+			return
+		}
+		if bi == be {
 			for i := ai; i < ae; i++ {
 				uniqueAlpha = append(uniqueAlpha, alpha[i])
 			}
 			return
 		}
 	}
-
 	// POST: alpha and bravo strings do not match; but we still have more in both lists
 
 	// build common suffix
-	defer func() { reverse(suffix) }() // reverse string slice in place
+	defer func() { reverse(suffix) }() // in-place reversal of the suffix string slice
 
 	as, bs := ai, bi // remember right side of slices where each started from
 	ae, be = ai, bi  //
 	ai = al - 1      // start alpha index at final element in alpha slice
 	bi = bl - 1      // start bravo index at final element in bravo slice
 
-	for {
-		if alpha[ai] != bravo[bi] {
-			break
-		}
+	for alpha[ai] == bravo[bi] {
 		suffix = append(suffix, alpha[ai])
 		ai--
 		bi--
-		if ai < ae || bi < be {
-			if ai < ae {
-				for i := be; i < bs+2; i++ {
-					uniqueBravo = append(uniqueBravo, bravo[i])
-				}
+		// When either slice is at its end, we are done.
+		if ai < ae {
+			for i := be; i < bs+2; i++ {
+				uniqueBravo = append(uniqueBravo, bravo[i])
 			}
-			if bi < be {
-				for i := ae; i < as+2; i++ {
-					uniqueAlpha = append(uniqueAlpha, alpha[i])
-				}
+			return
+		}
+		if bi < be {
+			for i := ae; i < as+2; i++ {
+				uniqueAlpha = append(uniqueAlpha, alpha[i])
 			}
 			return
 		}
 	}
+	// POST: everything remaining is unique to each respective slice.
 
 	for i := ae; i < ai+1; i++ {
 		uniqueAlpha = append(uniqueAlpha, alpha[i])
@@ -165,7 +160,7 @@ func Strings(alpha, bravo []string) (diff []string) {
 	// uniqueBravo := tiger, dog, cat, hippo, monkey
 
 	am, bm := findNextMatch(uniqueAlpha, uniqueBravo)
-	// NOTE: Both values are -1, or both values are greater or equal to 0.
+	// POST: Both values are -1, or both values are greater or equal to 0.
 
 	if am >= 0 {
 		rdiff := Strings(uniqueAlpha[:am], uniqueBravo[:bm])
